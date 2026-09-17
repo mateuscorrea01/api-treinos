@@ -18,8 +18,8 @@ app.use(express.json());
 // Os dados moram aqui, na memoria. Somem quando o servidor cai.
 // (Na Aula 03 isso vira banco de dados.)
 // ------------------------------------------------------------
-const treinos = [];
-let proximoId = 1;
+const treinos = []
+let proximoId = 3;
 
 // ------------------------------------------------------------
 // Validacao
@@ -40,7 +40,7 @@ function validarTreino(corpo) {
 // ------------------------------------------------------------
 // GET /treinos - lista todos os treinos
 // ------------------------------------------------------------
-app.get('/ treinos ', (req, res) => {
+app.get('/treinos', (req, res) => {
     res.status(200).json(treinos);
 });
 
@@ -49,7 +49,7 @@ app.get('/ treinos ', (req, res) => {
 // GET /treinos/:id - busca um treino pelo id (404 se nao existir)
 // ------------------------------------------------------------
 
-app.get('/ treinos /: id ', (req, res) => {
+app.get('/treinos/:id', (req, res) => {
     const id = Number(req.params.id);
     const treino = treinos.find((t) => t.id === id);
     if (treino === undefined) {
@@ -62,7 +62,7 @@ app.get('/ treinos /: id ', (req, res) => {
 // POST /treinos - cria um treino (400 se os dados forem invalidos)
 // ------------------------------------------------------------
 
-app.post('/ treinos ', (req, res) => {
+app.post('/treinos', (req, res) => {
     const erro = validarTreino(req.body);
     if (erro !== null) {
         return res.status(400).json({ erro: erro });
@@ -81,7 +81,7 @@ app.post('/ treinos ', (req, res) => {
 // PUT /treinos/:id - substitui um treino
 // ------------------------------------------------------------
 
-app.put('/ treinos /: id ', (req, res) => {
+app.put('/treinos/:id', (req, res) => {
     const id = Number(req.params.id);
     const treino = treinos.find((t) => t.id === id);
     if (treino === undefined) {
@@ -100,7 +100,7 @@ app.put('/ treinos /: id ', (req, res) => {
 // DELETE /treinos/:id - remove um treino
 // ------------------------------------------------------------
 
-app.delete('/ treinos /: id ', (req, res) => {
+app.delete('/treinos/:id ', (req, res) => {
     const id = Number(req.params.id);
     const posicao = treinos.findIndex((t) => t.id === id);
     if (posicao === -1) {
