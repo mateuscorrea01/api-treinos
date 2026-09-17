@@ -88,5 +88,5 @@ DELETE {{url}}/treinos/2
 DELETE {{url}}/treinos/99999
 
 
-### 12 - Listar de novo pra conferir       -> espera 200
+### 12 - Listar de novo pra conferir       -> espera 200 /
 GET {{url}}/treinos
