@@ -41,7 +41,7 @@ function validarTreino(corpo) {
 // ------------------------------------------------------------
 // GET /treinos - lista todos os treinos
 // ------------------------------------------------------------
-app.get('/ treinos ', (req, res) => {
+app.get('/treinos', (req, res) => {
     res.status(200).json(treinos);
 });
 
