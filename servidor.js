@@ -10,10 +10,19 @@
 // ============================================================
 
 const express = require('express');
+const { DatabaseSync } = require('node:sqlite');
 const app = express();
-
-// Faz o Express entender JSON no corpo das requisicoes
 app.use(express.json());
+// Conecta ao banco (cria o arquivo treinos.db se nao existir)
+const db = new DatabaseSync('treinos.db');
+// Garante que a tabela existe
+db.exec(`
+CREATE TABLE IF NOT EXISTS treinos (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+nome TEXT NOT NULL,
+duracao INTEGER NOT NULL
+)
+`);
 
 // ------------------------------------------------------------
 // Os dados moram aqui, na memoria. Somem quando o servidor cai.
@@ -30,7 +39,7 @@ let proximoId = 3;
 
 function validarTreino(corpo) {
     if (typeof corpo.nome !== 'string' || corpo.nome.trim() === '')
-    return 'O campo nome e obrigatorio e deve ser um texto .!';
+        return 'O campo nome e obrigatorio e deve ser um texto .!';
 
 
     if (typeof corpo.duracao !== 'number' || corpo.duracao <= 0) {
@@ -42,9 +51,9 @@ function validarTreino(corpo) {
 // GET /treinos - lista todos os treinos
 // ------------------------------------------------------------
 app.get('/treinos', (req, res) => {
+    const treinos = db.prepare('SELECT * FROM treinos').all();
     res.status(200).json(treinos);
 });
-
 
 // ------------------------------------------------------------
 // GET /treinos/:id - busca um treino pelo id (404 se nao existir)
@@ -68,46 +77,47 @@ app.post('/treinos', (req, res) => {
     if (erro !== null) {
         return res.status(400).json({ erro: erro });
     }
-    const treino = {
-        id: proximoId,
-        nome: req.body.nome,
-        duracao: req.body.duracao
-    };
-    proximoId = proximoId + 1;
-    treinos.push(treino);
-    res.status(201).json(treino);
+    // Insere no banco
+    const resultado = db
+        .prepare('INSERT INTO treinos (nome, duracao) VALUES (?, ?)')
+        .run(req.body.nome, req.body.duracao);
+    // Busca o treino recem-criado para devolver com o id gerado
+    const novo = db
+        .prepare('SELECT * FROM treinos WHERE id = ?')
+        .get(resultado.lastInsertRowid);
+    res.status(201).json(novo);
 });
 
 // ------------------------------------------------------------
 // PUT /treinos/:id - substitui um treino
 // ------------------------------------------------------------
 
-app.put('/treinos/:id ', (req, res) => {
-    const id = Number(req.params.id);
-    const treino = treinos.find((t) => t.id === id);
-    if (treino === undefined) {
-        return res.status(404).json({ erro: 'Treino nao encontrado .' });
-    }
+app.post('/treinos', (req, res) => {
     const erro = validarTreino(req.body);
     if (erro !== null) {
         return res.status(400).json({ erro: erro });
     }
-    treino.nome = req.body.nome;
-    treino.duracao = req.body.duracao;
-    res.status(200).json(treino);
+    // Insere no banco
+    const resultado = db
+        .prepare('INSERT INTO treinos (nome, duracao) VALUES (?, ?)')
+        .run(req.body.nome, req.body.duracao);
+    // Busca o treino recem-criado para devolver com o id gerado
+    const novo = db
+        .prepare('SELECT * FROM treinos WHERE id = ?')
+        .get(resultado.lastInsertRowid);
+    res.status(201).json(novo);
 });
-
 // ------------------------------------------------------------
 // DELETE /treinos/:id - remove um treino
 // ------------------------------------------------------------
 
-app.delete('/treinos/:id ', (req, res) => {
+app.delete('/treinos/:id', (req, res) => {
     const id = Number(req.params.id);
-    const posicao = treinos.findIndex((t) => t.id === id);
-    if (posicao === -1) {
-        return res.status(404).json({ erro: 'Treino nao encontrado .' });
+    const treino = db.prepare('SELECT * FROM treinos WHERE id = ?').get(id);
+    if (treino === undefined) {
+        return res.status(404).json({ erro: 'Treino nao encontrado.' });
     }
-    treinos.splice(posicao, 1);
+    db.prepare('DELETE FROM treinos WHERE id = ?').run(id);
     res.status(204).end();
 });
 
