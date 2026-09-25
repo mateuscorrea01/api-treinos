@@ -22,15 +22,40 @@ function validarTreino(corpo) {
   return null;
 }
 
-// GET /treinos
+// GET /treinos (Com Desafio 10 - Busca por Nome)
 app.get('/treinos', (req, res) => {
+  const busca = req.query.busca;
+
+  if (busca) {
+    const termo = `%${busca}%`;
+    const treinosFiltrados = db.prepare('SELECT * FROM treinos WHERE nome LIKE ?').all(termo);
+    return res.status(200).json(treinosFiltrados);
+  }
+
   const treinos = db.prepare('SELECT * FROM treinos').all();
   res.status(200).json(treinos);
 });
 
-// GET /treinos/:id
+// GET /treinos/resumo (Desafio 11 - Resumo com COUNT, SUM e AVG)
+app.get('/treinos/resumo', (req, res) => {
+  const resumo = db.prepare('SELECT COUNT(*) as total, SUM(duracao) as minutos, AVG(duracao) as media FROM treinos').get();
+  
+  res.status(200).json({
+    total: resumo.total || 0,
+    minutos: resumo.minutos || 0,
+    media: resumo.media || 0
+  });
+});
+
+// GET /treinos/:id (Com Desafio 12 - Id Inválido 400 vs 404)
 app.get('/treinos/:id', (req, res) => {
-  const id = Number(req.params.id);
+  const idOriginal = req.params.id;
+  const id = Number(idOriginal);
+
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ erro: 'O id deve ser um numero inteiro.' });
+  }
+
   const treino = db.prepare('SELECT * FROM treinos WHERE id = ?').get(id);
 
   if (treino === undefined) {

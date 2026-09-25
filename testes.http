@@ -90,3 +90,15 @@ DELETE {{url}}/treinos/99999
 
 ### 12 - Listar de novo pra conferir       -> espera 200 /
 GET {{url}}/treinos
+
+### 13. Busca por nome (Filtrar por 'peito')
+GET {{url}}/treinos?busca=peito
+
+### 14. Resumo estatístico (COUNT, SUM, AVG)
+GET {{url}}/treinos/resumo
+
+### 15. Id invalido (Texto - Deve dar erro 400)
+GET {{url}}/treinos/abc
+
+### 16. Id invalido (Número inexistente - Deve dar erro 404)
+GET {{url}}/treinos/999
