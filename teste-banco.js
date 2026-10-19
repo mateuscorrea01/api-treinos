@@ -1,11 +1,17 @@
-const { DatabaseSync } = require('node:sqlite');
-const db = new DatabaseSync('treinos.db');
-db.exec(`
-CREATE TABLE IF NOT EXISTS treinos (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-nome TEXT NOT NULL,
-duracao INTEGER NOT NULL)
-`);
-db.prepare('INSERT INTO treinos (nome, duracao) VALUES (?, ?)')
-    .run('Teste de banco', 10);
-console.log(db.prepare('SELECT * FROM treinos').all());
+const service = require('./services/treinosService.js');
+
+console.log(service.listarTodos());
+
+console.log(
+    service.criarTreino({
+        nome: 'Teste sem servidor',
+        duracao: 15
+    })
+);
+
+console.log(
+    service.criarTreino({
+        nome: '',
+        duracao: 15
+    })
+);
