@@ -1,23 +1,27 @@
 const db = require('../banco.js');
+
+// Método antigo (provavelmente de treinos)
 function listarTodos() {
     return db.prepare('SELECT * FROM treinos').all();
 }
+
+// Usado internamente pelo login (traz o senha_hash)
+function buscarPorUsuario(usuario) {
+    return db
+        .prepare('SELECT * FROM usuarios WHERE usuario = ?')
+        .get(usuario);
+}
+
+// Usado para respostas públicas (segurança: não traz a senha)
 function buscarPorId(id) {
-    return db.prepare('SELECT * FROM treinos WHERE id = ?').get(id);
+    return db
+        .prepare('SELECT id, usuario FROM usuarios WHERE id = ?')
+        .get(id);
 }
-function criar(nome, duracao) {
-    const resultado = db
-        .prepare('INSERT INTO treinos (nome, duracao) VALUES (?, ?)')
-        .run(nome, duracao);
-    return buscarPorId(resultado.lastInsertRowid);
-}
-function atualizar(id, nome, duracao) {
-    db.prepare('UPDATE treinos SET nome = ?, duracao = ? WHERE id = ?')
-        .run(nome, duracao, id);
-    return buscarPorId(id);
-}
-function remover(id) {
-    const resultado = db.prepare('DELETE FROM treinos WHERE id = ?').run(id);
-    return resultado.changes > 0;
-}
-module.exports = { listarTodos, buscarPorId, criar, atualizar, remover };
+
+// EXPORTAÇÃO: Necessária para que o Service e o Controller consigam achar as funções!
+module.exports = {
+    listarTodos,
+    buscarPorUsuario,
+    buscarPorId
+};
