@@ -1,0 +1,1 @@
+Mateus, tua nota de repositório foi 1,4 de 2,5. Os testes passaram só em parte das aulas, e as aulas 5 e 6 foram entregues no mesmo dia, 06/11, com menos de uma hora entre elas, com trechos que parecem colados de outra fonte sem adaptação. Por isso a nota foi descontada: metade pela entrega e metade pelo histórico e pelas estruturas usadas. Se tiver dúvida, fala na próxima aula.
